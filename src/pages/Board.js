@@ -6,6 +6,7 @@ import axios from 'axios';
 
 const Board = () => {
     const [board, setBoard] = useState(null);
+    const [fileList, setFileList] = useState([]);
 
     const {id} = useParams();
 
@@ -26,6 +27,7 @@ const Board = () => {
             });
 
             setBoard(() => response.data.item);
+            setFileList(() => response.data.item.boardFileDtoList);
         } catch(e) {
             alert('에러가 발생했습니다.');
         }
@@ -228,12 +230,14 @@ const Board = () => {
             });
 
             if(response.data && response.data.statusCode === 200) {
+                console.log(response.data);
                 alert("정상적으로 수정되었습니다.");
-                // uploadFiles = [];
-                // changeFiles = [];
-                // originFiles = [];
-                // setBoard(response.data.item);
-                window.location.reload();
+                uploadFiles = [];
+                changeFiles = [];
+                originFiles = [];
+                setBoard(() => response.data.item);
+                setFileList(() => response.data.item.boardFileDtoList);
+                // window.location.reload();
             }
         } catch(e) {
             alert('에러가 발생했습니다.');
@@ -274,8 +278,10 @@ const Board = () => {
 
         sendFormData.append('originFiles', JSON.stringify(originFiles));
 
+        document.querySelector("#preview").innerHTML = '';
+
         modify(sendFormData);
-    }, [board, uploadFiles, changeFiles, originFiles]);
+    }, [uploadFiles, changeFiles, originFiles]);
 
   return (
     <Container maxWidth='md' style={{marginTop: '3%', textAlign: 'center'}}>
@@ -438,7 +444,7 @@ const Board = () => {
                 <Grid item
                       xs={10}>
                     <Container component='div' name='preview' id='preview'>
-                        {board != null && board.boardFileDtoList.map((boardFile, index) => (
+                        {fileList && fileList.map((boardFile, index) => (
                             <div key={index}
                                  style={{
                                     display: 'inline-block',
@@ -461,7 +467,7 @@ const Board = () => {
                                      className='fileImg'
                                      id={`img${boardFile.id}`}
                                      src={boardFile.filetype === 'image'
-                                        ? `https://kr.object.ncloudstorage.com/bitcamp-69/${boardFile.filepath}${boardFile.filename}`
+                                        ? `https://kr.object.ncloudstorage.com/bitcamp-57/${boardFile.filepath}${boardFile.filename}`
                                         : '/images/defaultFileImg.png'
                                      }
                                      onClick={() => openChangeFileInput(boardFile.id)}
